@@ -1,0 +1,165 @@
+mixed-port: 7890
+allow-lan: true
+bind-address: "*"
+lan-allowed-ips:
+  - 127.0.0.0/8
+  - 10.0.0.0/8
+  - 172.16.0.0/12
+  - 192.168.0.0/16
+  - ::1/128
+  - fc00::/7
+tcp-concurrent: true
+enable-process: true
+find-process-mode: always
+mode: rule
+log-level: info
+ipv6: false
+keep-alive-interval: 30
+unified-delay: true
+profile:
+  store-selected: true
+  store-fake-ip: true
+sniffer:
+  enable: true
+  force-dns-mapping: true
+  parse-pure-ip: true
+  override-destination: false
+  sniff:
+    HTTP:
+      ports:
+        - 80
+        - 8080-8880
+      override-destination: true
+    TLS:
+      ports:
+        - 443
+        - 8443
+  skip-dst-address:
+    - 0.0.0.0/8
+    - 10.0.0.0/8
+    - 127.0.0.0/8
+    - 192.168.0.0/16
+    - fc00::/7
+tun:
+  enable: true
+  stack: gvisor
+  auto-route: true
+  auto-detect-interface: true
+  dns-hijack:
+    - any:53
+    - tcp://any:53
+  strict-route: true
+dns:
+  enable: true
+  prefer-h3: false
+  use-hosts: true
+  use-system-hosts: true
+  ipv6: false
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  default-nameserver:
+    - https://77.88.8.8/dns-query#DIRECT
+    - https://94.140.14.14/dns-query#DIRECT
+  proxy-server-nameserver:
+    - https://77.88.8.8/dns-query#DIRECT
+    - https://94.140.14.14/dns-query#DIRECT
+  nameserver:
+    - https://8.8.8.8/dns-query
+    - https://1.1.1.1/dns-query
+    - https://94.140.14.14/dns-query
+  nameserver-policy:
+    rule-set:oisd_big:
+      - rcode://refused
+rule-providers:
+  oisd_big:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/legiz-ru/mihomo-rule-sets/main/oisd/big.mrs
+    path: ./rule-sets/oisd_big.mrs
+    interval: 86400
+
+proxies:
+  - name: Вкл. 🐻‍❄️
+    type: direct
+    udp: true
+proxy-providers:
+  sub-github.com:
+    type: http
+    url: "https://github.com/KiryaScript/white-lists/raw/refs/heads/main/githubmirror/26.txt"
+    interval: 43200
+  sub-raw.githubusercontent.com:
+    type: http
+    url: "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Mobile.txt"
+    interval: 43200
+  sub-raw.githubusercontent.com-2:
+    type: http
+    url: "https://raw.githubusercontent.com/EtoNeYaProject/etoneyaproject.github.io/refs/heads/main/whitelist"
+    interval: 43200
+  sub-raw.githubusercontent.com-3:
+    type: http
+    url: "https://raw.githubusercontent.com/zieng2/wl/main/vless_universal.txt"
+    interval: 43200
+  sub-github.com-2:
+    type: http
+    url: "https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/6.txt"
+    interval: 43200
+  sub-github.com-3:
+    type: http
+    url: "https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/23.txt"
+    interval: 43200
+  sub-github.com-4:
+    type: http
+    url: "https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/24.txt"
+    interval: 43200
+  sub-github.com-5:
+    type: http
+    url: "https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/26.txt"
+    interval: 43200
+  sub-gitverse.ru:
+    type: http
+    url: "https://gitverse.ru/api/repos/bywarm/rser/raw/branch/master/selected.txt"
+    interval: 43200
+  sub-raw.githubusercontent.com-4:
+    type: http
+    url: "https://raw.githubusercontent.com/ByeWhiteLists/ByeWhiteLists2/refs/heads/main/ByeWhiteLists2.txt"
+    interval: 43200
+  sub-raw.githubusercontent.com-5:
+    type: http
+    url: "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-CIDR-RU-checked.txt"
+    interval: 43200
+
+proxy-groups:
+  - name: 🚀 Main
+    icon: https://cdn.jsdelivr.net/gh/TheWite/icons@main/osmain.png
+    type: select
+    proxies:
+      - 🐻‍❄️🦀
+  - name: 🐻‍❄️🦀
+    icon: https://cdn.jsdelivr.net/gh/TheWite/icons@main/oslogo.png
+    type: url-test
+    url: https://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    proxies:
+      - Вкл. 🐻‍❄️
+    use:
+      - sub-github.com
+      - sub-raw.githubusercontent.com
+      - sub-raw.githubusercontent.com-2
+      - sub-raw.githubusercontent.com-3
+      - sub-github.com-2
+      - sub-github.com-3
+      - sub-github.com-4
+      - sub-github.com-5
+      - sub-gitverse.ru
+      - sub-raw.githubusercontent.com-4
+      - sub-raw.githubusercontent.com-5
+
+rules:
+  - RULE-SET,oisd_big,REJECT
+  - IP-CIDR,192.168.0.0/16,DIRECT
+  - IP-CIDR,10.0.0.0/8,DIRECT
+  - IP-CIDR,172.16.0.0/12,DIRECT
+  - IP-CIDR,127.0.0.0/8,DIRECT
+  - MATCH,🐻‍❄️🦀
